@@ -22,8 +22,8 @@ class VendorGlassPriceSeeder extends Seeder
             foreach ($vendors as $vendor) {
 
                 $base = match ($glassType->name) {
-                    'Windshield' => 250,
-                    'Rear Glass' => 220,
+                    'Front Windshield' => 250,
+                    'Rear Windshield' => 220,
                     'Front Right Door Glass' => 180,
                     'Front Left Door Glass' => 180,
                     'Rear Right Door Glass' => 180,
