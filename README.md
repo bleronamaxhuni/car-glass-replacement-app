@@ -1,58 +1,194 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Car Glass Replacement Quote App
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel web application that lets users select their car (make, model, year, body type) using data from a mock external API, choose a glass part to replace, view 3–4 vendor options with price, warranty and delivery time, and submit a quote request stored in the database.
 
-## About Laravel
+## Project Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Car selection:** Makes, models, years and body types are loaded from a mock external API (in-app service). Users pick their vehicle in a cascading form.
+- **Glass selection:** After choosing the car, users pick which glass to replace (e.g. front windshield, rear door glass) from a list of glass types.
+- **Vendor options:** The app returns 3–4 replacement options from different vendors, each with price, warranty period and estimated delivery time.
+- **Quote request:** The user selects one vendor; a quote is created and a summary is shown (car, glass, vendor, final price, date). Quote data is stored in the database.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The project uses **PSR-4** autoloading, **Composer** for dependencies, **Form Requests** for validation, and a **CarApiClient** & **QuoteService** for business logic. PHPUnit tests cover the car API, vendor options and quote creation.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Requirements
 
-## Learning Laravel
+- PHP 8.3+
+- Composer
+- MySQL
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Installation
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. **Clone the repository**
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+   ```bash
+   git clone <repository-url>
+   cd car-glass-replacement-app
+   ```
 
-## Agentic Development
+2. **Install dependencies**
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+   ```bash
+   composer install
+   ```
 
-```bash
-composer require laravel/boost --dev
+3. **Environment and key**
 
-php artisan boost:install
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. **Database**
+
+   - **MySQL:** set `DB_CONNECTION=mysql`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT` in `.env`.
+
+5. **Run migrations and seed data**
+
+   ```bash
+   php artisan migrate --seed
+   ```
+
+   This creates tables and seeds car body types, glass types, vendors and vendor glass prices.
+
+## Usage
+
+1. **Start the development server**
+
+   ```bash
+   php artisan serve
+   ```
+
+2. **Open the app**
+
+   In your browser go to `http://localhost:8000` (or the URL shown by `artisan serve`).
+
+3. **Request a quote**
+
+   - Choose **Make** → **Model** → **Year** → **Body type** (dropdowns load from the mock car API).
+   - Choose **Glass to replace**.
+   - Click **View vendor options**.
+   - On the vendor options page, pick one vendor and click **Use this vendor**.
+   - Review the quote summary (quote ID, car, glass, vendor, price, date). You can start another quote from the link on the summary page.
+
+## API Documentation
+
+Base URL for API routes: `http://localhost:8000/api` (or your app URL + `/api`).
+
+All car endpoints return JSON with a `data` key for success, or `message` and HTTP 404/422 for errors.
+
+### Car data (mock external API)
+
+| Method | Endpoint | Parameters | Description |
+|--------|----------|------------|-------------|
+| GET | `/api/car/makes` | — | List of car makes. |
+| GET | `/api/car/models` | `make` (required) | Models for the given make. |
+| GET | `/api/car/years` | `make`, `model` (required) | Years for the given make and model. |
+| GET | `/api/car/body-types` | `make`, `model`, `year` (required, integer) | Body types for the given make/model/year. |
+
+**Example: get models**
+
+```http
+GET /api/car/models?make=Toyota
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+**Response (200)**
 
-## Contributing
+```json
+{
+  "data": ["Corolla", "RAV4"]
+}
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**Response (404)** – no data for the given make
 
-## Code of Conduct
+```json
+{
+  "message": "No models found for the given make."
+}
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**Response (422)** – validation error (e.g. missing `make`)
 
-## Security Vulnerabilities
+```json
+{
+  "message": "The make field is required.",
+  "errors": { "make": ["The make field is required."] }
+}
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Quote flow (web + optional API-style)
+
+Quote creation is primarily done via the **web** routes (browser form). Request bodies use form encoding or JSON; validation is the same.
+
+| Method | Endpoint | Body / params | Description |
+|--------|----------|----------------|-------------|
+| POST | `/quotes/vendor-options` | `make`, `model`, `year`, `body_type`, `glass_type_id` | Returns HTML view with vendor options for the selected car and glass. On error, redirects back with validation or business errors. |
+| POST | `/quotes` | `car_id`, `glass_type_id`, `vendor_glass_price_id` | Creates a quote and returns HTML summary view. |
+
+**Example: request vendor options (JSON)**
+
+```http
+POST /quotes/vendor-options
+Content-Type: application/json
+
+{
+  "make": "Toyota",
+  "model": "Corolla",
+  "year": 2019,
+  "body_type": "Sedan",
+  "glass_type_id": 1
+}
+```
+
+**Example: create quote (JSON)**
+
+```http
+POST /quotes
+Content-Type: application/json
+
+{
+  "car_id": 1,
+  "glass_type_id": 1,
+  "vendor_glass_price_id": 1
+}
+```
+
+Web routes are protected by CSRF when called from the browser; for API-style tools (e.g. Postman) you can use the same URLs with a valid session and CSRF token, or call the API routes below if you add them and they skip CSRF.
+
+### Mock data
+
+- **Car data:** Provided by `App\Services\CarApiClient` (in-memory mock). Makes include Toyota and Volkswagen with sample models, years and body types.
+- **Vendor and glass data:** Seeded by `Database\Seeders\GlassTypeSeeder`, `VendorSeeder`, `VendorGlassPriceSeeder`. Run `php artisan migrate --seed` to populate.
+
+## Testing
+
+**Run all tests**
+
+```bash
+php artisan test
+```
+
+**What is covered**
+
+- **Unit:** `CarApiClient` (makes, models, years, body types; valid and invalid input). `QuoteService` (get vendor options with success / body_type error / no_vendors error; create quote and persist data).
+- **Feature:** Car API endpoints (success, 404 when no data, 422 when required params missing). Quote flow: POST vendor-options (success, validation, body type error, no vendors); POST quotes (success, validation, invalid IDs).
+
+## Project structure (relevant parts)
+
+- `app/Http/Controllers/QuoteController.php` – quote create form, vendor options, store quote.
+- `app/Http/Controllers/Api/CarApiController.php` – car makes, models, years, body types API.
+- `app/Services/CarApiClient.php` – mock external car API.
+- `app/Services/QuoteService.php` – vendor options and quote creation logic.
+- `app/Http/Requests/Quote/` – validation for vendor options and store quote.
+- `app/Http/Requests/Api/` – validation for car API.
+- `app/Models/` – Car, CarBodyType, GlassType, Vendor, VendorGlassPrice, Quote.
+- `database/migrations/` – tables for cars, body types, glass types, vendors, vendor_glass_prices, quotes.
+- `database/seeders/` – seed data for body types, glass types, vendors, vendor glass prices.
+- `resources/views/quotes/` – create, vendor-options, summary Blade views.
+- `tests/Unit/` – CarApiClientTest, QuoteServiceTest.
+- `tests/Feature/` – CarApiTest, QuoteFlowTest.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
