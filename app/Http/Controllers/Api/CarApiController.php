@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CarBodyTypesRequest;
-use App\Http\Requests\CarModelsRequest;
-use App\Http\Requests\CarYearsRequest;
+use App\Http\Requests\Api\CarBodyTypesRequest;
+use App\Http\Requests\Api\CarModelsRequest;
+use App\Http\Requests\Api\CarYearsRequest;
 use App\Services\CarApiClient;
 use Illuminate\Http\JsonResponse;
 

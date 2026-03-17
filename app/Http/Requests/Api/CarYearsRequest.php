@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Api;
 
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Validate input for fetching body types by make, model and year
+ * Validate input for fetching car years by make and model
  */
-class CarBodyTypesRequest extends FormRequest
+class CarYearsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request
@@ -27,8 +27,6 @@ class CarBodyTypesRequest extends FormRequest
         return [
             'make' => ['required', 'string'],
             'model' => ['required', 'string'],
-            'year' => ['required', 'integer'],
         ];
     }
 }
-
