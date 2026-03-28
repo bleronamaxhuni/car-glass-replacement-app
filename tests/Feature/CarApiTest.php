@@ -27,12 +27,12 @@ class CarApiTest extends TestCase
         $this->assertContains('RAV4', $data);
     }
 
-    public function test_get_models_returns_404_when_no_models_found(): void
+    public function test_get_models_returns_empty_data_when_no_models_found(): void
     {
         $response = $this->getJson('/api/car/models?make=UnknownMake');
 
-        $response->assertStatus(404)
-            ->assertJsonStructure(['message']);
+        $response->assertStatus(200)
+            ->assertJson(['data' => []]);
     }
 
     public function test_get_models_requires_make_parameter(): void
@@ -54,11 +54,12 @@ class CarApiTest extends TestCase
         $this->assertContains(2020, $data);
     }
 
-    public function test_get_years_returns_404_when_no_years_found(): void
+    public function test_get_years_returns_empty_data_when_no_years_found(): void
     {
         $response = $this->getJson('/api/car/years?make=Unknown&model=Unknown');
 
-        $response->assertStatus(404);
+        $response->assertStatus(200)
+            ->assertJson(['data' => []]);
     }
 
     public function test_get_years_requires_make_and_model(): void
@@ -78,11 +79,12 @@ class CarApiTest extends TestCase
         $this->assertContains('Sedan', $data);
     }
 
-    public function test_get_body_types_returns_404_when_no_body_types_found(): void
+    public function test_get_body_types_returns_empty_data_when_no_body_types_found(): void
     {
         $response = $this->getJson('/api/car/body-types?make=Toyota&model=Corolla&year=1990');
 
-        $response->assertStatus(404);
+        $response->assertStatus(200)
+            ->assertJson(['data' => []]);
     }
 
     public function test_get_body_types_requires_make_model_and_year(): void

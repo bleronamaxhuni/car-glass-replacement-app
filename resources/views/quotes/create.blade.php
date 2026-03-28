@@ -234,6 +234,12 @@
 
         try {
             const { data } = await fetchJson(`${apiBase}/car/models?make=${encodeURIComponent(make)}`);
+            if (!data.length) {
+                setStatus('<span>No models available for this make.</span>');
+                modelSelect.disabled = true;
+                toggleNextButton();
+                return;
+            }
             data.forEach(model => {
                 const opt = document.createElement('option');
                 opt.value = model;
@@ -266,6 +272,12 @@
 
         try {
             const { data } = await fetchJson(`${apiBase}/car/years?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}`);
+            if (!data.length) {
+                setStatus('<span>No years available for this model.</span>');
+                yearSelect.disabled = true;
+                toggleNextButton();
+                return;
+            }
             data.forEach(year => {
                 const opt = document.createElement('option');
                 opt.value = year;
@@ -297,6 +309,12 @@
 
         try {
             const { data } = await fetchJson(`${apiBase}/car/body-types?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&year=${encodeURIComponent(year)}`);
+            if (!data.length) {
+                setStatus('<span>No body types available for this selection.</span>');
+                bodyTypeSelect.disabled = true;
+                toggleNextButton();
+                return;
+            }
             data.forEach(type => {
                 const opt = document.createElement('option');
                 opt.value = type;

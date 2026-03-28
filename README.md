@@ -75,7 +75,7 @@ The project uses **PSR-4** autoloading, **Composer** for dependencies, **Form Re
 
 Base URL for API routes: `http://localhost:8000/api` (or your app URL + `/api`).
 
-All car endpoints return JSON with a `data` key for success, or `message` and HTTP 404/422 for errors.
+Successful car list responses always return HTTP **200** with a `data` array (possibly empty when nothing matches the filters). Validation errors use **422** with `message` / `errors`.
 
 ### Car data (mock external API)
 
@@ -100,11 +100,11 @@ GET /api/car/models?make=Toyota
 }
 ```
 
-**Response (404)** – no data for the given make
+**Response (200)** – no models for the given make (empty result)
 
 ```json
 {
-  "message": "No models found for the given make."
+  "data": []
 }
 ```
 
@@ -172,7 +172,7 @@ php artisan test
 **What is covered**
 
 - **Unit:** `CarApiClient` (makes, models, years, body types; valid and invalid input). `QuoteService` (get vendor options with success / body_type error / no_vendors error; create quote and persist data).
-- **Feature:** Car API endpoints (success, 404 when no data, 422 when required params missing). Quote flow: POST vendor-options (success, validation, body type error, no vendors); POST quotes (success, validation, invalid IDs).
+- **Feature:** Car API endpoints (200 with `data`, including empty arrays; 422 when required params missing). Quote flow: POST vendor-options (success, validation, body type error, no vendors); POST quotes (success, validation, invalid IDs).
 
 ## Project structure (relevant parts)
 

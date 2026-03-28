@@ -49,14 +49,8 @@ class CarApiController extends Controller
 
         $models = $this->client->getModels($validated['make']);
 
-        if (empty($models)) {
-            return response()->json([
-                'message' => 'No models found for the given make.',
-            ], 404);
-        }
-
         return response()->json([
-            'data' => $models,
+            'data' => array_values($models),
         ]);
     }
 
@@ -72,14 +66,8 @@ class CarApiController extends Controller
 
         $years = $this->client->getYears($validated['make'], $validated['model']);
 
-        if (empty($years)) {
-            return response()->json([
-                'message' => 'No years found for the given make/model.',
-            ], 404);
-        }
-
         return response()->json([
-            'data' => $years,
+            'data' => array_values($years),
         ]);
     }
 
@@ -99,14 +87,8 @@ class CarApiController extends Controller
             (int) $validated['year']
         );
 
-        if (empty($bodyTypes)) {
-            return response()->json([
-                'message' => 'No body types found for the given selection.',
-            ], 404);
-        }
-
         return response()->json([
-            'data' => $bodyTypes,
+            'data' => array_values($bodyTypes),
         ]);
     }
 }
